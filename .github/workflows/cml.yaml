@@ -1,0 +1,33 @@
+name: CML & MLOps Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Setup CML
+        uses: iterative/setup-cml@v1
+
+      - name: Generisanje CML Izveštaja
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## MLOps Report - Performance Metrics" > report.md
+          echo "Automatski generisan izveštaj nakon pokretanja pajplajna." >> report.md
+          echo "" >> report.md
+          echo "```json" >> report.md
+          cat metrics.json >> report.md
+          echo "```" >> report.md
+          cml comment create report.md
