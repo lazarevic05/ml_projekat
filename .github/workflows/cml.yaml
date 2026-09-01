@@ -43,7 +43,7 @@ jobs:
           ### Poređenje sa main granom:
           EOF
 
-          dvc metrics diff origin/main --targets metrics.json --show-md >> report.md || echo "Nema prethodnih metrika za poređenje." >> report.md
+          dvc metrics diff origin/main --targets metrics.json --md >> report.md || echo "Nema prethodnih metrika za poređenje." >> report.md
 
           python3 -c "
           import json
