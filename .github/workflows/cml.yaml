@@ -32,11 +32,14 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "## MLOps Report - Performance Metrics" > report.md
-          echo "Automatski generisan izveštaj nakon pokretanja pajplajna." >> report.md
-          echo "" >> report.md
-          echo "```json" >> report.md
+          cat << 'EOF' > report.md
+          ## MLOps Report - Performance Metrics
+          Automatski generisan izveštaj nakon pokretanja pajplajna.
+
+          ```json
+          EOF
           cat metrics.json >> report.md
-          echo "```" >> report.md
+          echo "" >> report.md
+          echo '```' >> report.md
 
           cml comment create report.md
