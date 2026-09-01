@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -27,19 +29,34 @@ jobs:
       - name: Setup CML
         uses: iterative/setup-cml@v1
 
-      - name: Generisanje CML Izveštaja
+      - name: Install DVC
+        run: pip install dvc
+
+      - name: Generisanje CML Izveštaja i Model Gating
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cat << 'EOF' > report.md
-          ## MLOps Report - Performance Metrics
-          Automatski generisan izveštaj nakon pokretanja pajplajna.
-
-          ```json
+          ## MLOps Report - Pull Request Evaluation
+          
+          ### Poređenje sa main granom:
           EOF
-          cat metrics.json >> report.md
-          echo "" >> report.md
-          echo '```' >> report.md
+
+          dvc metrics diff origin/main --targets metrics.json --show-md >> report.md || echo "Nema prethodnih metrika za poređenje." >> report.md
+
+          python3 -c "
+          import json
+          metrics = json.load(open('metrics.json'))
+          acc = metrics.get('accuracy', 0)
+          threshold = 0.75
+          
+          with open('report.md', 'a') as f:
+              f.write('\n\n### Model Quality Gate (Prag: 0.75)\n')
+              if acc >= threshold:
+                  f.write(f'PROŠAO PRAG: Tačnost ({acc}) zadovoljava uslov (>= {threshold}). Model je odobren!\n')
+              else:
+                  f.write(f'NIJE PROŠAO PRAG: Tačnost ({acc}) je manja od praga ({threshold}). Model je odbijen!\n')
+          "
 
           cml comment create report.md
