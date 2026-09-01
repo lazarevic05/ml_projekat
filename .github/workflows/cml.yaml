@@ -6,11 +6,18 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions: write-all
+
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -23,6 +30,7 @@ jobs:
       - name: Generisanje CML Izveštaja
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "## MLOps Report - Performance Metrics" > report.md
           echo "Automatski generisan izveštaj nakon pokretanja pajplajna." >> report.md
@@ -30,4 +38,5 @@ jobs:
           echo "```json" >> report.md
           cat metrics.json >> report.md
           echo "```" >> report.md
+
           cml comment create report.md
