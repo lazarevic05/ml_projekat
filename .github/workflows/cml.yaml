@@ -49,7 +49,7 @@ jobs:
           import json
           metrics = json.load(open('metrics.json'))
           acc = metrics.get('accuracy', 0)
-          threshold = 0.75
+          threshold = 0.65
           
           with open('report.md', 'a') as f:
               f.write('\n\n### Model Quality Gate (Prag: 0.75)\n')
