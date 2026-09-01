@@ -36,11 +36,8 @@ with open("models/model_columns.pkl", "wb") as f:
     pickle.dump(X_train.columns.tolist(), f)
 
 print("Treniram Random Forest model nad IMDb podacima...")
-model = RandomForestClassifier(
-    n_estimators=params["n_estimators"],
-    max_depth=params["max_depth"],
-    random_state=params["random_state"]
-)
+model = RandomForestClassifier(**params)
+
 model.fit(X_train, y_train)
 
 model_path = "models/model.pkl"
